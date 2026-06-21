@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Onita's Market - Gourmet Food Delivery</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #f97316;
+      --primary-glow: rgba(249, 115, 22, 0.4);
+      --bg: #0f0f11;
+      --card-bg: #18181b;
+      --card-border: rgba(255, 255, 255, 0.05);
+      --text: #f4f4f5;
+      --text-muted: #a1a1aa;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    h1, h2, h3, h4 {
+      font-family: 'Outfit', sans-serif;
+    }
+
+    nav {
+      background: rgba(15, 15, 17, 0.95);
+      border-bottom: 1px solid var(--card-border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 1rem 4%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      backdrop-filter: blur(10px);
+    }
+
+    .nav-logo {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .nav-cart-btn {
+      background: rgba(249, 115, 22, 0.15);
+      border: 1px solid var(--primary);
+      color: var(--primary);
+      padding: 0.5rem 1.25rem;
+      border-radius: 9999px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+    }
+
+    .nav-cart-btn:hover {
+      box-shadow: 0 0 15px var(--primary-glow);
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 4%;
+    }
+
+    /* Category Filter */
+    .categories-row {
+      display: flex;
+      gap: 1rem;
+      overflow-x: auto;
+      padding: 1rem 0;
+      margin-bottom: 2rem;
+    }
+
+    .categories-row::-webkit-scrollbar {
+      display: none;
+    }
+
+    .category-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 0.75rem 1.5rem;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .category-card:hover, .category-card.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+      box-shadow: 0 4px 14px var(--primary-glow);
+    }
+
+    /* Food Grid */
+    .food-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 2rem;
+    }
+
+    .food-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.3s ease, border-color 0.3s ease;
+    }
+
+    .food-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--primary);
+    }
+
+    .food-img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+
+    .food-body {
+      padding: 1.5rem;
+    }
+
+    .food-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .food-desc {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+      margin-bottom: 1.25rem;
+      height: 40px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .food-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .food-price {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .add-btn {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 38px;
+      height: 38px;
+      font-size: 1.25rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s ease;
+    }
+
+    .add-btn:hover {
+      transform: scale(1.1);
+    }
+
+    /* Cart Slider */
+    .cart-slider {
+      position: fixed;
+      top: 0;
+      right: -420px;
+      width: 400px;
+      height: 100vh;
+      background: #121214;
+      border-left: 1px solid var(--card-border);
+      z-index: 1000;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+      transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .cart-slider.open {
+      right: 0;
+    }
+
+    .cart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      padding-bottom: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .cart-items {
+      flex-grow: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .cart-item-info h5 {
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    .cart-item-info p {
+      font-size: 0.8rem;
+      color: var(--primary);
+      font-weight: bold;
+    }
+
+    .cart-qty-ctrl {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .qty-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cart-checkout-section {
+      border-top: 1px solid rgba(255,255,255,0.05);
+      padding-top: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .checkout-line {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+      margin-bottom: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .checkout-line.total {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #fff;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      padding-top: 0.75rem;
+      margin-top: 0.5rem;
+    }
+
+    /* Live Tracking view */
+    #tracking-view {
+      display: none;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 2.5rem;
+      margin-top: 2rem;
+    }
+
+    .tracking-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 2rem;
+    }
+
+    @media(max-width: 768px) {
+      .tracking-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* SVG Map styling */
+    .map-container {
+      background: #09090b;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      height: 350px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    svg.delivery-map {
+      width: 100%;
+      height: 100%;
+    }
+
+    .road-path {
+      stroke: #333337;
+      stroke-width: 8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    .road-highlight {
+      stroke: var(--primary);
+      stroke-width: 4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+      stroke-dasharray: 600;
+      stroke-dashoffset: 600;
+      animation: trace 15s linear forwards;
+    }
+
+    @keyframes trace {
+      to { stroke-dashoffset: 0; }
+    }
+
+    .courier-marker {
+      fill: #fff;
+      stroke: var(--primary);
+      stroke-width: 3;
+      filter: drop-shadow(0 0 8px var(--primary-glow));
+    }
+
+    .status-timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .timeline-step {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      color: var(--text-muted);
+    }
+
+    .timeline-step.active {
+      color: #fff;
+      font-weight: bold;
+    }
+
+    .step-circle {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .timeline-step.active .step-circle {
+      border-color: var(--primary);
+      background-color: var(--primary);
+      box-shadow: 0 0 10px var(--primary-glow);
+    }
+
+    /* Driver chat */
+    .chat-container {
+      background: #0a0a0c;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      height: 350px;
+      justify-content: space-between;
+    }
+
+    .chat-messages {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding-right: 0.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .msg {
+      padding: 0.6rem 0.9rem;
+      border-radius: 12px;
+      max-width: 80%;
+      font-size: 0.85rem;
+      line-height: 1.4;
+    }
+
+    .msg.driver {
+      background: #18181b;
+      align-self: flex-start;
+      color: #fff;
+    }
+
+    .msg.user {
+      background: var(--primary);
+      align-self: flex-end;
+      color: #fff;
+    }
+
+    .chat-presets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .preset-chat-btn {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #fff;
+      padding: 0.4rem 0.8rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .preset-chat-btn:hover {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav>
+    <div class="nav-logo">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      Onita's Market
+    </div>
+    <button class="nav-cart-btn" onclick="toggleCart()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      <span id="cart-count">0</span> Items
+    </button>
+  </nav>
+
+  <!-- Main Storefront View -->
+  <div class="container" id="storefront-view">
+    <div class="categories-row">
+      <button class="category-card active" onclick="filterCategory('all', this)">All Gourmet</button>
+      <button class="category-card" onclick="filterCategory('burgers', this)">🍔 Burgers</button>
+      <button class="category-card" onclick="filterCategory('pizzas', this)">🍕 Pizzas</button>
+      <button class="category-card" onclick="filterCategory('sushi', this)">🍣 Sushi</button>
+      <button class="category-card" onclick="filterCategory('desserts', this)">🍰 Desserts</button>
+    </div>
+
+    <div class="food-grid" id="food-grid">
+      <!-- Grid items dynamically generated -->
+    </div>
+  </div>
+
+  <!-- Cart Drawer -->
+  <div class="cart-slider" id="cart-drawer">
+    <div class="cart-header">
+      <h3>Your Gourmet Cart</h3>
+      <button class="qty-btn" style="font-size:1.2rem;" onclick="toggleCart()">&times;</button>
+    </div>
+
+    <div class="cart-items" id="cart-items-container">
+      <!-- Added items go here -->
+    </div>
+
+    <div class="cart-checkout-section">
+      <div class="checkout-line"><span>Subtotal</span><span id="cart-subtotal">$0.00</span></div>
+      <div class="checkout-line"><span>Delivery fee</span><span>$3.99</span></div>
+      <div class="checkout-line total"><span>Total</span><span id="cart-total">$3.99</span></div>
+      <button class="btn btn-primary" style="width:100%; padding:1rem; margin-top:1rem; font-size:1.1rem;" onclick="placeOrder()">Place Gourmet Order</button>
+    </div>
+  </div>
+
+  <!-- Live Delivery Tracking View -->
+  <div class="container" id="tracking-view">
+    <h2 style="font-size:2rem; margin-bottom:1.5rem;">Courier Dispatch Center</h2>
+    <div class="tracking-grid">
+      <!-- SVG Map Left -->
+      <div style="display:flex; flex-direction:column; gap:1.5rem;">
+        <div class="map-container">
+          <svg class="delivery-map" viewBox="0 0 800 400">
+            <!-- Background Roads Grid -->
+            <path class="road-path" d="M 50 200 L 750 200" />
+            <path class="road-path" d="M 150 50 L 150 350" />
+            <path class="road-path" d="M 650 50 L 650 350" />
+            <path class="road-path" d="M 150 100 Q 400 50 650 100" />
+            <path class="road-path" d="M 150 300 Q 400 350 650 300" />
+
+            <!-- Active Delivery Route -->
+            <path id="route" class="road-highlight" d="M 150 300 C 150 200, 300 200, 400 200 C 500 200, 650 200, 650 100" />
+
+            <!-- Restaurant marker -->
+            <circle cx="150" cy="300" r="10" fill="#f97316" />
+            <text x="140" y="330" fill="#fff" font-size="12" font-family="monospace">Onita's Kitchen</text>
+
+            <!-- House marker -->
+            <polygon points="650,85 660,100 640,100" fill="#10b981" />
+            <rect x="642" y="100" width="16" height="12" fill="#10b981" />
+            <text x="630" y="70" fill="#fff" font-size="12" font-family="monospace">Your Home</text>
+
+            <!-- Courier marker -->
+            <circle id="courier" class="courier-marker" cx="150" cy="300" r="12" />
+          </svg>
+        </div>
+
+        <div class="status-timeline">
+          <div class="timeline-step active" id="step-1">
+            <div class="step-circle">✓</div>
+            <span>Gourmet order confirmed and received in kitchen</span>
+          </div>
+          <div class="timeline-step" id="step-2">
+            <div class="step-circle">2</div>
+            <span>Chef preparing gourmet delicacies</span>
+          </div>
+          <div class="timeline-step" id="step-3">
+            <div class="step-circle">3</div>
+            <span>Courier dispatched and transit route initialized</span>
+          </div>
+          <div class="timeline-step" id="step-4">
+            <div class="step-circle">4</div>
+            <span>Gourmet package safely delivered</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Driver Chat & API Integration Panel Right -->
+      <div style="display:flex; flex-direction:column; gap:1.5rem;">
+        <div class="chat-container" style="height:250px;">
+          <div style="font-weight:bold; font-size:1.1rem; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:0.5rem; color:var(--primary);">
+            Chat with Courier (Dave)
+          </div>
+          <div class="chat-messages" id="chat-box" style="height:120px;">
+            <div class="msg driver">Hello! I am preparing to pick up your gourmet package from Onita's Kitchen. I will update you as soon as I head out.</div>
+          </div>
+          <div class="chat-presets">
+            <button class="preset-chat-btn" onclick="sendChatMessage('Leave package at the door, thank you!')">Leave at door</button>
+            <button class="preset-chat-btn" onclick="sendChatMessage('Please call when you arrive.')">Call on arrival</button>
+          </div>
+        </div>
+
+        <!-- API Dispatch Control Card -->
+        <div style="background:#18181b; border:1px solid var(--card-border); border-radius:12px; padding:1.25rem;">
+          <div style="font-weight:bold; font-size:1rem; margin-bottom:0.75rem; color:var(--primary); display:flex; justify-content:space-between; align-items:center;">
+            <span>API Delivery Provider</span>
+            <span id="provider-badge" style="font-size:0.75rem; background:rgba(249,115,22,0.15); color:var(--primary); padding:0.15rem 0.4rem; border-radius:4px; border:1px solid var(--primary-glow); font-weight:bold;">DoorDash Drive</span>
+          </div>
+          <div style="display:flex; gap:0.5rem; margin-bottom:1rem;">
+            <button class="preset-chat-btn" style="flex:1; background:rgba(249,115,22,0.05); border-color:var(--primary-glow);" onclick="setProvider('doordash')">DoorDash API</button>
+            <button class="preset-chat-btn" style="flex:1;" id="shipt-btn-select" onclick="setProvider('shipt')">Shipt Shopper</button>
+          </div>
+          <div style="background:#09090b; padding:0.75rem; border-radius:6px; font-family:monospace; font-size:0.75rem; color:#a1a1aa; line-height:1.5;" id="api-telemetry-box">
+            <div>[API Status]: Connected to Sandbox</div>
+            <div>[Quote ID]: dd_drv_99b2c3</div>
+            <div>[Fee]: $3.99 | ETA: 12 mins</div>
+            <div>[Log]: Generated DoorDash Drive payload & requested quote.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const foodItems = [
+      {
+        id: 1,
+        title: "Maroon Volcano Burger",
+        category: "burgers",
+        price: 14.99,
+        img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&q=80",
+        desc: "Angus beef, lava cheese, spicy jalapeños, smoked chipotle glaze, toasted brioche."
+      },
+      {
+        id: 2,
+        title: "Truffle Prosciutto Pizza",
+        category: "pizzas",
+        price: 18.99,
+        img: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400&q=80",
+        desc: "Shaved black truffle, aged prosciutto, fresh mozzarella, organic wild arugula."
+      },
+      {
+        id: 3,
+        title: "Volcanic Dragon Roll",
+        category: "sushi",
+        price: 16.50,
+        img: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=400&q=80",
+        desc: "Spicy tuna, cucumber, topped with avocado, unagi, volcanic spicy mayonnaise."
+      },
+      {
+        id: 4,
+        title: "Salted Caramel Lava Dome",
+        category: "desserts",
+        price: 8.99,
+        img: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400&q=80",
+        desc: "Molten chocolate dome, oozing hot salted caramel, organic vanilla bean ice cream."
+      },
+      {
+        id: 5,
+        title: "Premium Wagyu Sliders",
+        category: "burgers",
+        price: 21.00,
+        img: "https://images.unsplash.com/photo-1521305916504-4a1121188589?w=400&q=80",
+        desc: "Three mini Wagyu beef patties, caramelized balsamic onions, aged gruyère."
+      }
+    ];
+
+    let cart = [];
+
+    function loadStorefront() {
+      const grid = document.getElementById('food-grid');
+      grid.innerHTML = '';
+      foodItems.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'food-card';
+        card.setAttribute('data-category', item.category);
+        card.innerHTML = `
+          <img class="food-img" src="${item.img}" alt="${item.title}">
+          <div class="food-body">
+            <h4 class="food-title">${item.title}</h4>
+            <p class="food-desc">${item.desc}</p>
+            <div class="food-footer">
+              <span class="food-price">$${item.price.toFixed(2)}</span>
+              <button class="add-btn" onclick="addToCart(${item.id})">+</button>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function filterCategory(cat, btn) {
+      document.querySelectorAll('.category-card').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+
+      const cards = document.querySelectorAll('.food-card');
+      cards.forEach(card => {
+        if (cat === 'all' || card.getAttribute('data-category') === cat) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    function toggleCart() {
+      document.getElementById('cart-drawer').classList.toggle('open');
+    }
+
+    function addToCart(id) {
+      const item = foodItems.find(f => f.id === id);
+      const existing = cart.find(c => c.id === id);
+
+      if (existing) {
+        existing.qty++;
+      } else {
+        cart.push({ ...item, qty: 1 });
+      }
+
+      updateCartUI();
+    }
+
+    function updateCartUI() {
+      const container = document.getElementById('cart-items-container');
+      container.innerHTML = '';
+
+      let subtotal = 0;
+      let totalQty = 0;
+
+      cart.forEach(item => {
+        subtotal += item.price * item.qty;
+        totalQty += item.qty;
+
+        const row = document.createElement('div');
+        row.className = 'cart-item';
+        row.innerHTML = `
+          <div class="cart-item-info">
+            <h5>${item.title}</h5>
+            <p>$${(item.price * item.qty).toFixed(2)}</p>
+          </div>
+          <div class="cart-qty-ctrl">
+            <button class="qty-btn" onclick="changeQty(${item.id}, -1)">-</button>
+            <span>${item.qty}</span>
+            <button class="qty-btn" onclick="changeQty(${item.id}, 1)">+</button>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+
+      document.getElementById('cart-count').textContent = totalQty;
+      document.getElementById('cart-subtotal').textContent = `$${subtotal.toFixed(2)}`;
+      document.getElementById('cart-total').textContent = `$${(subtotal + 3.99).toFixed(2)}`;
+    }
+
+    function changeQty(id, delta) {
+      const item = cart.find(c => c.id === id);
+      if (item) {
+        item.qty += delta;
+        if (item.qty <= 0) {
+          cart = cart.filter(c => c.id !== id);
+        }
+      }
+      updateCartUI();
+    }
+
+    // Order Sequence
+    function placeOrder() {
+      if (cart.length === 0) {
+        alert("Your cart is empty!");
+        return;
+      }
+      toggleCart();
+      document.getElementById('storefront-view').style.display = 'none';
+      document.getElementById('tracking-view').style.display = 'block';
+
+      // Start delivery animation sequence
+      runDeliverySimulation();
+    }
+
+    function runDeliverySimulation() {
+      const path = document.getElementById('route');
+      const courier = document.getElementById('courier');
+      const totalLength = path.getTotalLength();
+
+      // Start steps timeline animation
+      setTimeout(() => {
+        setStepActive(2, "Chef finished cooking. Gourmet food packaged securely.");
+      }, 3000);
+
+      setTimeout(() => {
+        setStepActive(3, `Courier picked up packages. Delivery Provider Sandbox webhook triggers en route update.`);
+        // Begin courier marker motion trace along SVG path
+        animateCourier(path, courier, totalLength);
+      }, 7000);
+    }
+
+    function setStepActive(stepNum, msg) {
+      document.querySelectorAll('.timeline-step').forEach(s => s.classList.remove('active'));
+      const activeStep = document.getElementById('step-' + stepNum);
+      activeStep.classList.add('active');
+      activeStep.querySelector('.step-circle').textContent = '✓';
+
+      // Add driver updates
+      addDriverMessage(msg);
+    }
+
+    function animateCourier(path, courier, length) {
+      let startTime = null;
+      const duration = 12000; // 12 seconds transit
+
+      function step(timestamp) {
+        if (!startTime) startTime = timestamp;
+        const elapsed = timestamp - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        // Get point along SVG path coordinate
+        const point = path.getPointAtLength(progress * length);
+        courier.setAttribute('cx', point.x);
+        courier.setAttribute('cy', point.y);
+
+        if (progress < 1) {
+          requestAnimationFrame(step);
+        } else {
+          // Delivered
+          setStepActive(4, `Delivered via ${activeProvider === 'doordash' ? 'DoorDash Dasher' : 'Shipt Shopper'}! Enjoy your gourmet meal!`);
+        }
+      }
+      requestAnimationFrame(step);
+    }
+
+    // Driver Chat System
+    function addDriverMessage(text) {
+      const box = document.getElementById('chat-box');
+      const msg = document.createElement('div');
+      msg.className = 'msg driver';
+      msg.textContent = text;
+      box.appendChild(msg);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function sendChatMessage(text) {
+      const box = document.getElementById('chat-box');
+      const userMsg = document.createElement('div');
+      userMsg.className = 'msg user';
+      userMsg.textContent = text;
+      box.appendChild(userMsg);
+      box.scrollTop = box.scrollHeight;
+
+      // Simulated reply from driver
+      setTimeout(() => {
+        addDriverMessage("Acknowledged. Will do! 👍");
+      }, 1500);
+    }
+
+    // Provider switching
+    let activeProvider = 'doordash';
+    const providers = {
+      doordash: {
+        badge: "DoorDash Drive",
+        quote: "dd_drv_99b2c3",
+        log: "Created DoorDash Drive payload & requested quote."
+      },
+      shipt: {
+        badge: "Shipt Delivery",
+        quote: "shipt_smd_88a1c4",
+        log: "Created Shipt dispatch payload & routed shopper."
+      }
+    };
+
+    function setProvider(p) {
+      activeProvider = p;
+      const data = providers[p];
+      document.getElementById('provider-badge').textContent = data.badge;
+      
+      const logBox = document.getElementById('api-telemetry-box');
+      logBox.innerHTML = `
+        <div>[API Status]: Connected to Sandbox</div>
+        <div>[Quote ID]: ${data.quote}</div>
+        <div>[Fee]: $3.99 | Provider: ${data.badge}</div>
+        <div>[Log]: ${data.log}</div>
+      `;
+      addDriverMessage(`[System] Dispatch provider switched: ${data.badge}`);
+    }
+
+    loadStorefront();
+  </script>
+</body>
+</html>

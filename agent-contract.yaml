@@ -1,0 +1,19 @@
+﻿identity:
+  agent_id: "onitas"
+  domain: "economy"
+  mivl_tier: "VERIFIED_L2"
+security:
+  fail_closed_mode: true
+  audit_sink: "/var/maroon/ledger/truth_ledger.jsonl"
+communication:
+  protocol: "gRPC"
+  event_bus_access: true
+  direct_pillar_calls: false  # FORBIDDEN. Use event bus.
+governance:
+  compliance_check: "OPA_ENABLED"
+  heartbeat_interval: 30s
+headers:
+  mivl_token: "<sha512_hash>"
+  source_origin: "maroon-onitas"
+  timestamp: "<iso8601>"
+  governance_check: "verified"

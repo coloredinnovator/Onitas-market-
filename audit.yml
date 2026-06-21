@@ -1,0 +1,14 @@
+﻿name: onitas audit
+on: [push]
+jobs:
+  mivl_handshake_audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install pytest pyyaml
+      - run: pytest tests/test_handshake.py
+  security_gates:
+    - mivl_handshake_required: true
+    - fail_closed_mode: enforced
+  domain_specific_gates:
+    - pci_dss_scan: true

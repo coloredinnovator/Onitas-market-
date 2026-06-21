@@ -1,0 +1,15 @@
+﻿.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.plan
+*.pem
+*.key
+credentials.json
+service-account-key.json
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+node_modules/
+.env
